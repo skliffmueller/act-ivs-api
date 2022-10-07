@@ -6,6 +6,8 @@ This is a video list generator to increase the feature set of [Act Keyboard Play
 
 Also checkout my pairing project [act-rtmp-encoder](https://github.com/skliffmueller/act-rtmp-encoder) Which was used in generating the demo live stream above.
 
+The project utilizes AWS Lambdas to watch for S3 bucket putObject events in an IVS s3 bucket. Then updates a json file on another s3 bucket to be used for video playback features.
+
 The project source includes function code and supporting resources:
 
 - `function` - A Node.js function.
