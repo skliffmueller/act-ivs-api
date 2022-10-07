@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Lambda application that calls the Lambda API.
+Parameters:
+  DataBucket:
+    Type: String
+    Default: act-player-video-archive
+  IVSBucket:
+    Type: String
+    Default: ivs-act-1
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      CodeUri: s3://lambda-artifacts-90a8040e8b592e7f/2f7ce242fb2f270c88fd8e219eefa876
+      Description: Call the AWS Lambda API
+      Timeout: 10
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AWSLambda_ReadOnlyAccess
+      - AWSXrayWriteOnlyAccess
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:ListStorageLensConfigurations
+          - s3:ListAccessPointsForObjectLambda
+          - s3:GetAccessPoint
+          - s3:PutAccountPublicAccessBlock
+          - s3:GetAccountPublicAccessBlock
+          - s3:ListAllMyBuckets
+          - s3:ListAccessPoints
+          - s3:PutAccessPointPublicAccessBlock
+          - s3:ListJobs
+          - s3:PutStorageLensConfiguration
+          - s3:ListMultiRegionAccessPoints
+          - s3:CreateJob
+          Resource: arn:aws:s3:::*
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: s3:*
+          Resource:
+            Fn::Sub: arn:aws:s3:::${DataBucket}
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: s3:*
+          Resource:
+            Fn::Sub: arn:aws:s3:::${IVSBucket}
+      Tracing: Active
+      Layers:
+      - Ref: libs
+  libs:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ivs-api-lib
+      Description: Dependencies for the blank sample app.
+      ContentUri: s3://lambda-artifacts-90a8040e8b592e7f/2800c330fbc4f3291db59305ef85f601
+      CompatibleRuntimes:
+      - nodejs16.x
